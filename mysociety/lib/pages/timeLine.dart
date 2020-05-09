@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/header.dart';
+import '../widgets/progess.dart';
 
 class TimeLine extends StatefulWidget {
   @override
@@ -11,7 +12,7 @@ class _TimeLineState extends State<TimeLine> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: header(context, isAppTitle: true),
-      body: Text("TimeLine"),
+      body: circularProgress()
     );
   }
 }
