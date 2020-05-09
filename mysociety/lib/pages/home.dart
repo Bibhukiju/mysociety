@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -6,8 +7,11 @@ import 'activityfeed.dart';
 import 'profile.dart';
 import 'upload.dart';
 import 'search.dart';
+import 'createAccount.dart';
 
 final GoogleSignIn googleSignIn = GoogleSignIn();
+final userRef = Firestore.instance.collection("users");
+final DateTime timestamp = DateTime.now();
 
 class Home extends StatefulWidget {
   @override
@@ -39,7 +43,7 @@ class _HomeState extends State<Home> {
 
   handleSignIn(GoogleSignInAccount account) {
     if (account != null) {
-      print('User signed in!: $account');
+      createuserInFireStore();
       setState(() {
         isAuth = true;
       });
@@ -79,7 +83,12 @@ class _HomeState extends State<Home> {
     return Scaffold(
       body: PageView(
         children: <Widget>[
-          TimeLine(),
+          // TimeLine(),
+
+          RaisedButton(
+            child: Text('Logout'),
+            onPressed: logout,
+          ),
           ActivityFeed(),
           Upload(),
           Search(),
@@ -114,10 +123,6 @@ class _HomeState extends State<Home> {
             ),
           ]),
     );
-    // return RaisedButton(
-    //   child: Text('Logout'),
-    //   onPressed: logout,
-    // );
   }
 
   Scaffold buildUnAuthScreen() {
@@ -169,5 +174,27 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return isAuth ? buildAuthScreen() : buildUnAuthScreen();
+  }
+
+  createuserInFireStore() async {
+    //check if exist
+    final GoogleSignInAccount user = googleSignIn.currentUser;
+    final DocumentSnapshot doc = await userRef.document(user.id).get();
+
+    if (!doc.exists) {
+      final username = await Navigator.of(context).push(MaterialPageRoute(
+          builder: (BuildContext context) => CreateAccount()));
+      userRef.document(user.id).setData({
+        "id": user.id,
+        "username": username,
+        "photoUrl": user.photoUrl,
+        "email": user.email,
+        "displayName": user.displayName,
+        "bio": "",
+        "timestamp": timestamp
+      });
+    }
+
+    //if not create
   }
 }
