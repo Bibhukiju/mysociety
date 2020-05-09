@@ -25,6 +25,7 @@ dependencies:
   timeago:
   cached_network_image:
   cupertino_icons: ^0.1.3
+  flutter_svg:
 
 dev_dependencies:
   flutter_test:
@@ -32,3 +33,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/
+
+

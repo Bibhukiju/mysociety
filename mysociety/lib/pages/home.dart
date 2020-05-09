@@ -8,10 +8,12 @@ import 'profile.dart';
 import 'upload.dart';
 import 'search.dart';
 import 'createAccount.dart';
+import '../models/user.dart';
 
 final GoogleSignIn googleSignIn = GoogleSignIn();
 final userRef = Firestore.instance.collection("users");
 final DateTime timestamp = DateTime.now();
+User currentuser;
 
 class Home extends StatefulWidget {
   @override
@@ -76,7 +78,7 @@ class _HomeState extends State<Home> {
 
   onTap(int pageIndex) {
     pageController.animateToPage(pageIndex,
-        duration: Duration(milliseconds: 300), curve: Curves.easeIn);
+        duration: Duration(milliseconds: 300), curve: Curves.fastOutSlowIn);
   }
 
   Scaffold buildAuthScreen() {
@@ -194,7 +196,6 @@ class _HomeState extends State<Home> {
         "timestamp": timestamp
       });
     }
-
-    //if not create
+    currentuser = User.fromDocument(doc);
   }
 }
