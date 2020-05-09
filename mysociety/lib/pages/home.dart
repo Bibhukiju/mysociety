@@ -1,7 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:mysociety/pages/timeLine.dart';
+import 'activityfeed.dart';
+import 'profile.dart';
+import 'upload.dart';
+import 'search.dart';
 
-final GoogleSignIn googleSign = GoogleSignIn();
+final GoogleSignIn googleSignIn = GoogleSignIn();
 
 class Home extends StatefulWidget {
   @override
@@ -10,27 +16,30 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   bool isAuth = false;
-  login() {
-    googleSign.signIn();
-  }
+  PageController pageController;
+  int pageIndex = 0;
 
-  logout() {
-    googleSign.signOut();
-  }
-
-  buildAuthScreen() {
-    return Center(
-      child: RaisedButton(
-        onPressed: () {
-          logout();
-        },
-        child: Text("logOut"),
-      ),
-    );
+  @override
+  void initState() {
+    super.initState();
+    pageController = PageController();
+    // Detects when user signed in
+    googleSignIn.onCurrentUserChanged.listen((account) {
+      handleSignIn(account);
+    }, onError: (err) {
+      print('Error signing in: $err');
+    });
+    // Reauthenticate user when app is opened
+    googleSignIn.signInSilently(suppressErrors: false).then((account) {
+      handleSignIn(account);
+    }).catchError((err) {
+      print('Error signing in: $err');
+    });
   }
 
   handleSignIn(GoogleSignInAccount account) {
     if (account != null) {
+      print('User signed in!: $account');
       setState(() {
         isAuth = true;
       });
@@ -41,60 +50,122 @@ class _HomeState extends State<Home> {
     }
   }
 
-  Scaffold buildUnAuthScreen() {
-    return Scaffold(
-      body: Center(
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  begin: Alignment.topRight,
-                  end: Alignment.bottomLeft,
-                  colors: [
-                Theme.of(context).accentColor,
-                Theme.of(context).primaryColor,
-              ])),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                "MySociety",
-                style: TextStyle(
-                    fontSize: 80,
-                    color: Colors.white,
-                    fontStyle: FontStyle.italic),
-              ),
-              GestureDetector(
-                onTap: () {
-                  login();
-                },
-                child: Container(
-                  width: 260,
-                  height: 60,
-                  decoration: BoxDecoration(
-                      image: DecorationImage(
-                          fit: BoxFit.cover,
-                          image: NetworkImage(
-                              "https://i.stack.imgur.com/mGHPI.png"))),
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
+  @override
+  void dispose() {
+    pageController.dispose();
+    super.dispose();
+  }
+
+  login() {
+    googleSignIn.signIn();
+  }
+
+  logout() {
+    googleSignIn.signOut();
+  }
+
+  onPageChanged(int pageIndex) {
+    setState(() {
+      this.pageIndex = pageIndex;
+    });
+  }
+
+  onTap(int pageIndex) {
+    pageController.jumpToPage(
+      pageIndex,
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    googleSign.onCurrentUserChanged.listen((event) {
-      handleSignIn(event);
-    });
-    googleSign
-        .signInSilently(suppressErrors: false)
-        .then((value) => handleSignIn(value));
+  Scaffold buildAuthScreen() {
+    return Scaffold(
+      body: PageView(
+        children: <Widget>[
+          TimeLine(),
+          ActivityFeed(),
+          Upload(),
+          Search(),
+          Profile(),
+        ],
+        controller: pageController,
+        onPageChanged: onPageChanged,
+        physics: NeverScrollableScrollPhysics(),
+      ),
+      bottomNavigationBar: CupertinoTabBar(
+          currentIndex: pageIndex,
+          onTap: onTap,
+          activeColor: Theme.of(context).primaryColor,
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.whatshot),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.notifications_active),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.photo_camera,
+                size: 35.0,
+              ),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.search),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.account_circle),
+            ),
+          ]),
+    );
+    // return RaisedButton(
+    //   child: Text('Logout'),
+    //   onPressed: logout,
+    // );
+  }
+
+  Scaffold buildUnAuthScreen() {
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            colors: [
+              Theme.of(context).accentColor,
+              Theme.of(context).primaryColor,
+            ],
+          ),
+        ),
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'FlutterShare',
+              style: TextStyle(
+                fontFamily: "Signatra",
+                fontSize: 90.0,
+                color: Colors.white,
+              ),
+            ),
+            GestureDetector(
+              onTap: login,
+              child: Container(
+                width: 260.0,
+                height: 60.0,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(
+                      'assets/images/google_signin_button.png',
+                    ),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   @override
