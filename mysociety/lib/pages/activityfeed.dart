@@ -9,7 +9,7 @@ class _ActivityFeedState extends State<ActivityFeed> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Text("Whatsup"),
+      body: Center(child: Text("Whatsup")),
     );
   }
 }

@@ -9,7 +9,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme:
           ThemeData(primarySwatch: Colors.deepPurple, accentColor: Colors.teal),
-      title: "MySociety",
+      title: "Minista",
       debugShowCheckedModeBanner: false,
       home: Home(),
     );
