@@ -71,9 +71,8 @@ class _HomeState extends State<Home> {
   }
 
   onTap(int pageIndex) {
-    pageController.jumpToPage(
-      pageIndex,
-    );
+    pageController.animateToPage(pageIndex,
+        duration: Duration(milliseconds: 300), curve: Curves.easeIn);
   }
 
   Scaffold buildAuthScreen() {
@@ -140,7 +139,7 @@ class _HomeState extends State<Home> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Text(
-              'FlutterShare',
+              'Minista',
               style: TextStyle(
                 fontFamily: "Signatra",
                 fontSize: 90.0,
@@ -154,9 +153,8 @@ class _HomeState extends State<Home> {
                 height: 60.0,
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage(
-                      'assets/images/google_signin_button.png',
-                    ),
+                    image: NetworkImage(
+                        "https://user-images.githubusercontent.com/1531669/41761606-83b5bd42-762a-11e8-811a-b78fdf68bc04.png"),
                     fit: BoxFit.cover,
                   ),
                 ),
