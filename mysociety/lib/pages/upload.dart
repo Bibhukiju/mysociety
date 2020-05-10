@@ -108,15 +108,6 @@ class _UploadState extends State<Upload> {
                   CachedNetworkImageProvider(widget.currentUser.photoUrl),
             ),
             title: Container(
-              child: Text(
-                widget.currentUser.username,
-                style: TextStyle(color: Colors.black),
-              ),
-            ),
-          ),
-          ListTile(
-            leading: Icon(Icons.closed_caption,color: Colors.orange,),
-            title: Container(
               width: 250,
               child: TextField(
                 decoration: InputDecoration(
@@ -139,11 +130,15 @@ class _UploadState extends State<Upload> {
             ),
           ),
           Center(
-            child: RaisedButton(
+            child: RaisedButton.icon(
+              color: Colors.blue,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
-              color: Theme.of(context).primaryColor,
-              child: Text("Use Current Location"),
+              label: Text("Use Current Location"),
+              icon: Icon(
+                Icons.my_location,
+                color: Colors.white,
+              ),
               onPressed: () {},
             ),
           )
