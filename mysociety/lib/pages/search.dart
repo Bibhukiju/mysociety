@@ -57,7 +57,7 @@ class _SearchState extends State<Search> {
           shrinkWrap: true,
           children: <Widget>[
             SvgPicture.asset(
-              'assets/images/search.svg',
+              'assets/search.svg',
               height: orientation == Orientation.portrait ? 300.0 : 200.0,
             ),
             Text(
@@ -91,12 +91,15 @@ class _SearchState extends State<Search> {
         return ListView.builder(
           itemCount: searchResults.length,
           itemBuilder: (BuildContext context, int index) {
-            return Container(
+            return Container( 
               child: ListTile(
+                onTap: ()=>print(searchResults[index].username),
+                contentPadding: EdgeInsets.all(10),
                 leading: CircleAvatar(
                   backgroundImage: NetworkImage(searchResults[index].photoUrl),
                 ),
                 title: Text(searchResults[index].username),
+                
               ),
             );
           },
