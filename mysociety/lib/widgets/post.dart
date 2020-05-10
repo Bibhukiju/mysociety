@@ -1,5 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:mysociety/models/user.dart';
+import 'package:mysociety/pages/home.dart';
+import 'package:mysociety/widgets/progess.dart';
 
 class Post extends StatefulWidget {
   final String postId;
@@ -75,6 +79,97 @@ class _PostState extends State<Post> {
       this.mediaUrl});
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        buildPostHeader(),
+        buildPostImage(),
+        buildPostFooter(),
+      ],
+    );
+  }
+
+  buildPostHeader() {
+    return FutureBuilder(
+      future: usersRef.document(ownerId).get(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          circularProgress();
+        }
+        User user = User.fromDocument(snapshot.data);
+        return ListTile(
+          leading: CircleAvatar(
+            backgroundImage: CachedNetworkImageProvider(user.photoUrl),
+            backgroundColor: Colors.grey,
+          ),
+          title: GestureDetector(
+            child: Text(
+              user.username,
+              style:
+                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+            ),
+          ),
+          subtitle: Text(location),
+          trailing: IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.more_vert),
+          ),
+        );
+      },
+    );
+  }
+
+  buildPostImage() {
+    return GestureDetector(
+      child: Stack(
+        alignment: Alignment.center,
+        children: <Widget>[Image.network(mediaUrl)],
+      ),
+    );
+  }
+
+  buildPostFooter() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
+        Padding(padding: EdgeInsets.only(top: 30, left: 20)),
+        GestureDetector(
+          onTap: () {},
+          child: Icon(
+            Icons.favorite_border,
+            size: 28,
+            color: Colors.red,
+          ),
+        ),
+        Padding(padding: EdgeInsets.only(right: 20)),
+        GestureDetector(
+          onTap: () {},
+          child: Icon(
+            Icons.chat,
+            size: 28,
+            color: Colors.blue[900],
+          ),
+        ),
+        Row(
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(left: 20),
+              child: Text("$likesCount likes"),
+            )
+          ],
+        ),
+        Row(
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(left: 20),
+              child: Text("$username"),
+            ),
+            Expanded(
+              child: Text(description),
+            )
+          ],
+        ),
+      ],
+    );
   }
 }
