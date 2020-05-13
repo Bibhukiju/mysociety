@@ -2,12 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../pages/home.dart';
+import '../pages/post_screen.dart';
+import '../pages/profile.dart';
 import '../widgets/header.dart';
 import '../widgets/progess.dart';
 import 'package:timeago/timeago.dart' as timeago;
-
-import 'post_screen.dart';
-import 'profile.dart';
 
 class ActivityFeed extends StatefulWidget {
   @override
@@ -88,6 +87,18 @@ class ActivityFeedItem extends StatelessWidget {
     );
   }
 
+  showPost(context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PostScreen(
+          postId: postId,
+          userId: userId,
+        ),
+      ),
+    );
+  }
+
   configureMediaPreview(context) {
     if (type == "like" || type == 'comment') {
       mediaPreview = GestureDetector(
@@ -143,7 +154,8 @@ class ActivityFeedItem extends StatelessWidget {
                   children: [
                     TextSpan(
                       text: username,
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(fontFamily: "Lobster",
+                      fontSize: 20),
                     ),
                     TextSpan(
                       text: ' $activityItemText',
@@ -163,19 +175,15 @@ class ActivityFeedItem extends StatelessWidget {
       ),
     );
   }
-
-  showPost(context) {
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (BuildContext context) => PostScreen(
-              postId: postId,
-              userId: userId,
-            )));
-  }
 }
 
 showProfile(BuildContext context, {String profileId}) {
-  Navigator.of(context).push(MaterialPageRoute(
-      builder: (BuildContext context) => Profile(
-            profileId: profileId,
-          )));
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => Profile(
+        profileId: profileId,
+      ),
+    ),
+  );
 }

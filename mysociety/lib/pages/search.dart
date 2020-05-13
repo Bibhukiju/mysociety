@@ -3,9 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import '../models/user.dart';
+import '../pages/activityfeed.dart';
 import '../pages/home.dart';
 import '../widgets/progess.dart';
-import 'activityfeed.dart';
 
 class Search extends StatefulWidget {
   @override
@@ -66,9 +66,9 @@ class _SearchState extends State<Search> {
               "Find Users",
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontFamily: "Lobster",
-                color: Colors.deepPurpleAccent[200],
+                color: Colors.white,
                 fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.w600,
                 fontSize: 60.0,
               ),
             ),
@@ -91,14 +91,8 @@ class _SearchState extends State<Search> {
           UserResult searchResult = UserResult(user);
           searchResults.add(searchResult);
         });
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ClipRRect(
-            borderRadius: BorderRadius.all(Radius.circular(20)),
-            child: ListView(
-              children: searchResults,
-            ),
-          ),
+        return ListView(
+          children: searchResults,
         );
       },
     );
@@ -107,7 +101,7 @@ class _SearchState extends State<Search> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade400,
+      backgroundColor: Theme.of(context).primaryColor.withOpacity(0.8),
       appBar: buildSearchField(),
       body:
           searchResultsFuture == null ? buildNoContent() : buildSearchResults(),
@@ -139,7 +133,7 @@ class UserResult extends StatelessWidget {
                     TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
               subtitle: Text(
-                user.displayName,
+                user.username,
                 style: TextStyle(color: Colors.white),
               ),
             ),

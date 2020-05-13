@@ -1,9 +1,11 @@
+import 'dart:async';
+
+import 'package:animator/animator.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:mysociety/pages/comments.dart';
 import '../models/user.dart';
-import '../pages/activityfeed.dart';
+import '../pages/comments.dart';
 import '../pages/home.dart';
 import '../widgets/custom_image.dart';
 import '../widgets/progess.dart';
@@ -75,9 +77,10 @@ class _PostState extends State<Post> {
   final String location;
   final String description;
   final String mediaUrl;
+  bool showHeart = false;
+  bool isLiked;
   int likeCount;
   Map likes;
-  bool isLiked;
 
   _PostState({
     this.postId,
@@ -104,7 +107,7 @@ class _PostState extends State<Post> {
             backgroundColor: Colors.grey,
           ),
           title: GestureDetector(
-            onTap: () => showProfile(context, profileId: user.id),
+            onTap: () => print('showing profile'),
             child: Text(
               user.username,
               style: TextStyle(
@@ -132,7 +135,7 @@ class _PostState extends State<Post> {
           .collection('userPosts')
           .document(postId)
           .updateData({'likes.$currentUserId': false});
-      removelikefromActivityFeed();
+      removeLikeFromActivityFeed();
       setState(() {
         likeCount -= 1;
         isLiked = false;
@@ -144,11 +147,53 @@ class _PostState extends State<Post> {
           .collection('userPosts')
           .document(postId)
           .updateData({'likes.$currentUserId': true});
-      addLikeToActivityFedd();
+      addLikeToActivityFeed();
       setState(() {
         likeCount += 1;
         isLiked = true;
         likes[currentUserId] = true;
+        showHeart = true;
+      });
+      Timer(Duration(milliseconds: 500), () {
+        setState(() {
+          showHeart = false;
+        });
+      });
+    }
+  }
+
+  addLikeToActivityFeed() {
+    // add a notification to the postOwner's activity feed only if comment made by OTHER user (to avoid getting notification for our own like)
+    bool isNotPostOwner = currentUserId != ownerId;
+    if (isNotPostOwner) {
+      activityFeedRef
+          .document(ownerId)
+          .collection("feedItems")
+          .document(postId)
+          .setData({
+        "type": "like",
+        "username": currentUser.username,
+        "userId": currentUser.id,
+        "userProfileImg": currentUser.photoUrl,
+        "postId": postId,
+        "mediaUrl": mediaUrl,
+        "timestamp": timestamp,
+      });
+    }
+  }
+
+  removeLikeFromActivityFeed() {
+    bool isNotPostOwner = currentUserId != ownerId;
+    if (isNotPostOwner) {
+      activityFeedRef
+          .document(ownerId)
+          .collection("feedItems")
+          .document(postId)
+          .get()
+          .then((doc) {
+        if (doc.exists) {
+          doc.reference.delete();
+        }
       });
     }
   }
@@ -182,8 +227,12 @@ class _PostState extends State<Post> {
             ),
             Padding(padding: EdgeInsets.only(right: 20.0)),
             GestureDetector(
-              onTap: () => showComments(context,
-                  postId: postId, ownerId: ownerId, mediaUrl: mediaUrl),
+              onTap: () => showComments(
+                context,
+                postId: postId,
+                ownerId: ownerId,
+                mediaUrl: mediaUrl,
+              ),
               child: Icon(
                 Icons.chat,
                 size: 28.0,
@@ -239,41 +288,15 @@ class _PostState extends State<Post> {
       ],
     );
   }
+}
 
-  showComments(BuildContext context,
-      {String postId, String ownerId, String mediaUrl}) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (BuildContext context) {
-      return Comments(
-          postId: postId, postOwnerId: ownerId, postMediaUrl: mediaUrl);
-    }));
-  }
-
-  addLikeToActivityFedd() {
-    activityFeedRef
-        .document(ownerId)
-        .collection("feed")
-        .document(postId)
-        .setData({
-      "type": "like",
-      "username": currentUser.username,
-      "userProfileImg": currentUser.photoUrl,
-      "postId": postId,
-      "mediaUrl": mediaUrl,
-      "timestamp": timestamp
-    });
-  }
-
-  removelikefromActivityFeed() {
-    activityFeedRef
-        .document(ownerId)
-        .collection("feedItems")
-        .document(postId)
-        .get()
-        .then((value) {
-      if (value.exists) {
-        value.reference.delete();
-      }
-    });
-  }
+showComments(BuildContext context,
+    {String postId, String ownerId, String mediaUrl}) {
+  Navigator.push(context, MaterialPageRoute(builder: (context) {
+    return Comments(
+      postId: postId,
+      postOwnerId: ownerId,
+      postMediaUrl: mediaUrl,
+    );
+  }));
 }
