@@ -1,9 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
 import 'package:mysociety/pages/home.dart';
 
 void main() {
-  runApp(MyApp());
+  return runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
