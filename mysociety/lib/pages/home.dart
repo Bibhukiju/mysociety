@@ -7,15 +7,18 @@ import '../pages/activityfeed.dart';
 import '../pages/createaccount.dart';
 import '../pages/profile.dart';
 import '../pages/search.dart';
-import '../pages/timeline.dart';
 import '../pages/upload.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
+import 'timeLine.dart';
 
 final GoogleSignIn googleSignIn = GoogleSignIn();
 final StorageReference storageRef = FirebaseStorage.instance.ref();
 final usersRef = Firestore.instance.collection('users');
 final postsRef = Firestore.instance.collection('posts');
+final timelineRef = Firestore.instance.collection('timeline');
 final commentsRef = Firestore.instance.collection('comments');
+
 final activityFeedRef = Firestore.instance.collection('feed');
 final followersRef = Firestore.instance.collection('followers');
 final followingRef = Firestore.instance.collection('followings');
@@ -122,7 +125,9 @@ class _HomeState extends State<Home> {
     return Scaffold(
       body: PageView(
         children: <Widget>[
-          TimeLine(currentUser: currentUser?.id),
+          Timeline(
+            currentUser: currentUser,
+          ),
           ActivityFeed(),
           Upload(currentUser: currentUser),
           Search(),
