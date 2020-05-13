@@ -1,12 +1,11 @@
 import 'dart:async';
-
-import 'package:animator/animator.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../models/user.dart';
 import '../pages/comments.dart';
 import '../pages/home.dart';
+
 import '../widgets/custom_image.dart';
 import '../widgets/progess.dart';
 
@@ -101,6 +100,7 @@ class _PostState extends State<Post> {
           return circularProgress();
         }
         User user = User.fromDocument(snapshot.data);
+        bool isPostOwner = currentUserId == ownerId;
         return ListTile(
           leading: CircleAvatar(
             backgroundImage: CachedNetworkImageProvider(user.photoUrl),
@@ -117,10 +117,12 @@ class _PostState extends State<Post> {
             ),
           ),
           subtitle: Text(location),
-          trailing: IconButton(
-            onPressed: () => print('deleting post'),
-            icon: Icon(Icons.more_vert),
-          ),
+          trailing: isPostOwner
+              ? IconButton(
+                  onPressed: () => handledeletePost(context),
+                  icon: Icon(Icons.more_vert),
+                )
+              : Text(""),
         );
       },
     );
@@ -287,6 +289,62 @@ class _PostState extends State<Post> {
         buildPostFooter()
       ],
     );
+  }
+
+  handledeletePost(BuildContext parentContext) {
+    return showDialog(
+        context: parentContext,
+        builder: (context) {
+          return SimpleDialog(
+            title: Text("Remove This post"),
+            children: <Widget>[
+              SimpleDialogOption(
+                child: Text(
+                  "Delete",
+                  style: TextStyle(color: Colors.red, fontFamily: "Lobster"),
+                ),
+                onPressed: deletePost,
+              ),
+              SimpleDialogOption(
+                child: Text("Cancel"),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          );
+        });
+  }
+
+  deletePost() async {
+    postsRef
+        .document(ownerId)
+        .collection("userPosts")
+        .document(postId)
+        .get()
+        .then((value) {
+      if (value.exists) {
+        value.reference.delete();
+      }
+    });
+    storageRef.child("post_$postId.jpg").delete();
+    QuerySnapshot activityFeedSnapshot = await activityFeedRef
+        .document(ownerId)
+        .collection("feedItems")
+        .where(postId, isEqualTo: postId)
+        .getDocuments();
+    activityFeedSnapshot.documents.forEach((element) {
+      if (element.exists) {
+        element.reference.delete();
+      }
+    });
+    QuerySnapshot comSnapShots = await commentsRef
+        .document(postId)
+        .collection("comments")
+        .getDocuments();
+    comSnapShots.documents.forEach((element) {
+      if (element.exists) {
+        element.reference.delete();
+      }
+    });
   }
 }
 
