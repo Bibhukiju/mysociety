@@ -6,6 +6,9 @@ import '../widgets/header.dart';
 import '../widgets/progess.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import 'post_screen.dart';
+import 'profile.dart';
+
 class ActivityFeed extends StatefulWidget {
   @override
   _ActivityFeedState createState() => _ActivityFeedState();
@@ -85,10 +88,10 @@ class ActivityFeedItem extends StatelessWidget {
     );
   }
 
-  configureMediaPreview() {
+  configureMediaPreview(context) {
     if (type == "like" || type == 'comment') {
       mediaPreview = GestureDetector(
-        onTap: () => print('showing post'),
+        onTap: () => showPost(context),
         child: Container(
           height: 50.0,
           width: 50.0,
@@ -121,7 +124,7 @@ class ActivityFeedItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    configureMediaPreview();
+    configureMediaPreview(context);
 
     return Padding(
       padding: EdgeInsets.only(bottom: 2.0),
@@ -129,7 +132,7 @@ class ActivityFeedItem extends StatelessWidget {
         color: Colors.white54,
         child: ListTile(
           title: GestureDetector(
-            onTap: () => print('show profile'),
+            onTap: () => showProfile(context, profileId: userId),
             child: RichText(
               overflow: TextOverflow.ellipsis,
               text: TextSpan(
@@ -160,4 +163,19 @@ class ActivityFeedItem extends StatelessWidget {
       ),
     );
   }
+
+  showPost(context) {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) => PostScreen(
+              postId: postId,
+              userId: userId,
+            )));
+  }
+}
+
+showProfile(BuildContext context, {String profileId}) {
+  Navigator.of(context).push(MaterialPageRoute(
+      builder: (BuildContext context) => Profile(
+            profileId: profileId,
+          )));
 }

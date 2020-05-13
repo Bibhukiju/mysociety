@@ -5,7 +5,6 @@ import 'package:timeago/timeago.dart' as timeago;
 import '../widgets/header.dart';
 import '../widgets/progess.dart';
 import 'home.dart';
-import 'home.dart';
 
 class Comments extends StatefulWidget {
   final String postId;
@@ -50,21 +49,20 @@ class _CommentsState extends State<Comments> {
       "avatarUrl": currentUser.photoUrl,
       "userId": currentUser.id,
     });
-  //   bool isNotPostOwner=widget.postOwnerId!=currentUser.id;
-  //  if(isNotPostOwner)
-   {
+    //   bool isNotPostOwner=widget.postOwnerId!=currentUser.id;
+    //  if(isNotPostOwner)
+    {
       activityFeedRef.document(widget.postOwnerId).collection("feedItems").add({
-      "type": "comment",
-      "commentData": commentController.text,
-      "username": currentUser.username,
-      "userProfileImg": currentUser.photoUrl,
-      "postId": widget.postId,
-      "mediaUrl": widget.postMediaUrl,
-      "timestamp": timestamp,
-      "userId":currentUser.id,
-
-    });
-   }
+        "type": "comment",
+        "commentData": commentController.text,
+        "username": currentUser.username,
+        "userProfileImg": currentUser.photoUrl,
+        "postId": widget.postId,
+        "mediaUrl": widget.postMediaUrl,
+        "timestamp": timestamp,
+        "userId": currentUser.id,
+      });
+    }
     commentController.clear();
   }
 

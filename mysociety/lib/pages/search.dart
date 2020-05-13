@@ -5,6 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import '../models/user.dart';
 import '../pages/home.dart';
 import '../widgets/progess.dart';
+import 'activityfeed.dart';
 
 class Search extends StatefulWidget {
   @override
@@ -93,7 +94,7 @@ class _SearchState extends State<Search> {
         return Padding(
           padding: const EdgeInsets.all(8.0),
           child: ClipRRect(
-            borderRadius: BorderRadius.all(Radius.circular(20  )),
+            borderRadius: BorderRadius.all(Radius.circular(20)),
             child: ListView(
               children: searchResults,
             ),
@@ -126,7 +127,7 @@ class UserResult extends StatelessWidget {
       child: Column(
         children: <Widget>[
           GestureDetector(
-            onTap: () => print('tapped'),
+            onTap: () => showProfile(context, profileId: user.id),
             child: ListTile(
               leading: CircleAvatar(
                 backgroundColor: Colors.grey,
