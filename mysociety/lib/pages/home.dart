@@ -4,13 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../models/user.dart';
 import '../pages/activityfeed.dart';
+import '../pages/createaccount.dart';
 import '../pages/profile.dart';
 import '../pages/search.dart';
 import '../pages/timeline.dart';
 import '../pages/upload.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
-import 'createAccount.dart';
 
 final GoogleSignIn googleSignIn = GoogleSignIn();
 final StorageReference storageRef = FirebaseStorage.instance.ref();
@@ -33,14 +32,14 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     pageController = PageController();
-    //Detects when user signed in
+    // Detects when user signed in
     googleSignIn.onCurrentUserChanged.listen((account) {
       handleSignIn(account);
     }, onError: (err) {
       print('Error signing in: $err');
     });
-    //Reauthenticate user when app is opened
-    googleSignIn.signInSilently(suppressErrors: true).then((account) {
+    // Reauthenticate user when app is opened
+    googleSignIn.signInSilently(suppressErrors: false).then((account) {
       handleSignIn(account);
     }).catchError((err) {
       print('Error signing in: $err');
@@ -119,7 +118,11 @@ class _HomeState extends State<Home> {
     return Scaffold(
       body: PageView(
         children: <Widget>[
-          TimeLine(),
+          // Timeline(),
+          OutlineButton(
+            child: Text('Logout'),
+            onPressed: logout,
+          ),
           ActivityFeed(),
           Upload(currentUser: currentUser),
           Search(),
@@ -167,30 +170,65 @@ class _HomeState extends State<Home> {
         ),
         alignment: Alignment.center,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'MINISTA',
-              style: TextStyle(
-                fontFamily: "Signatra",
-                fontSize: 90.0,
-                color: Colors.white,
+            SizedBox(
+              height: MediaQuery.of(context).size.height * .02,
+            ),
+            Container(
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    height: 100,
+                    width: 100,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Image(
+                        image: AssetImage("assets/logo.png"),
+                      ),
+                    ),
+                  ),
+                  Text(
+                    'MINISTA',
+                    style: TextStyle(
+                      fontFamily: "Lobster",
+                      fontSize: 60.0,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
             ),
-            GestureDetector(
-              onTap: login,
-              child: Container(
-                width: 260.0,
-                height: 60.0,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: NetworkImage(
-                        "https://raw.githubusercontent.com/react-native-community/google-signin/HEAD/img/signin-button.png"),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: GestureDetector(
+                  onTap: login,
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        CircleAvatar(
+                          backgroundImage: AssetImage("assets/googlelogo.jpg"),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * .1,
+                        ),
+                        Text(
+                          "Login with google",
+                          style: TextStyle(
+                              fontSize: 20,
+                              color: Theme.of(context).accentColor),
+                        ),
+                      ],
+                    ),
+                  )),
             )
           ],
         ),

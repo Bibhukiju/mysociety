@@ -9,7 +9,6 @@ import '../pages/home.dart';
 import '../widgets/progess.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mysociety/models/user.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as Im;
 import 'package:uuid/uuid.dart';
@@ -56,6 +55,9 @@ class _UploadState extends State<Upload>
       context: parentContext,
       builder: (context) {
         return SimpleDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))
+              ,
           title: Text("Create Post"),
           children: <Widget>[
             SimpleDialogOption(
@@ -75,7 +77,7 @@ class _UploadState extends State<Upload>
 
   Container buildSplashScreen() {
     return Container(
-      color: Theme.of(context).accentColor.withOpacity(0.6),
+      color: Colors.grey,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[

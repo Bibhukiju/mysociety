@@ -2,10 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:mysociety/models/user.dart';
-import 'package:mysociety/widgets/progess.dart';
-
-import 'home.dart';
+import '../models/user.dart';
+import '../pages/home.dart';
+import '../widgets/progess.dart';
 
 class Search extends StatefulWidget {
   @override
@@ -66,9 +65,9 @@ class _SearchState extends State<Search> {
               "Find Users",
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.white,
+                fontFamily: "Lobster",
+                color: Colors.deepPurpleAccent[200],
                 fontStyle: FontStyle.italic,
-                fontWeight: FontWeight.w600,
                 fontSize: 60.0,
               ),
             ),
@@ -91,8 +90,14 @@ class _SearchState extends State<Search> {
           UserResult searchResult = UserResult(user);
           searchResults.add(searchResult);
         });
-        return ListView(
-          children: searchResults,
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ClipRRect(
+            borderRadius: BorderRadius.all(Radius.circular(20  )),
+            child: ListView(
+              children: searchResults,
+            ),
+          ),
         );
       },
     );
@@ -101,7 +106,7 @@ class _SearchState extends State<Search> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).accentColor.withOpacity(0.8),
+      backgroundColor: Colors.grey.shade400,
       appBar: buildSearchField(),
       body:
           searchResultsFuture == null ? buildNoContent() : buildSearchResults(),
@@ -133,7 +138,7 @@ class UserResult extends StatelessWidget {
                     TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
               subtitle: Text(
-                user.username,
+                user.displayName,
                 style: TextStyle(color: Colors.white),
               ),
             ),

@@ -8,8 +8,13 @@ class ActivityFeed extends StatefulWidget {
 class _ActivityFeedState extends State<ActivityFeed> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(child: Text("Whatsup")),
-    );
+    return Text('Activity Feed');
+  }
+}
+
+class ActivityFeedItem extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Text('Activity Feed Item');
   }
 }
