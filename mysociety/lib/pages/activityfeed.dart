@@ -5,8 +5,7 @@ import '../pages/home.dart';
 import '../pages/post_screen.dart';
 import '../pages/profile.dart';
 import '../widgets/header.dart';
-import '../widgets/progess.dart';
-import 'package:mysociety/pages/profile.dart';
+import '../widgets/progress.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class ActivityFeed extends StatefulWidget {
@@ -103,6 +102,7 @@ class ActivityFeedItem extends StatelessWidget {
   configureMediaPreview(context) {
     if (type == "like" || type == 'comment') {
       mediaPreview = GestureDetector(
+        onTap: () => showPost(context),
         child: Container(
           height: 50.0,
           width: 50.0,

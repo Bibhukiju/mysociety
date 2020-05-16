@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../pages/home.dart';
 import '../widgets/header.dart';
-import '../widgets/progess.dart';
+import '../widgets/progress.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class Comments extends StatefulWidget {

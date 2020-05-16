@@ -7,7 +7,7 @@ import '../pages/comments.dart';
 import '../pages/home.dart';
 
 import '../widgets/custom_image.dart';
-import '../widgets/progess.dart';
+import '../widgets/progress.dart';
 
 class Post extends StatefulWidget {
   final String postId;

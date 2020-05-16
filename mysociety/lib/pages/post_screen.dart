@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../pages/home.dart';
 import '../widgets/header.dart';
 import '../widgets/post.dart';
-import '../widgets/progess.dart';
+import '../widgets/progress.dart';
 
 class PostScreen extends StatelessWidget {
   final String userId;
@@ -21,21 +21,20 @@ class PostScreen extends StatelessWidget {
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return circularProgress();
-        } else {
-          Post post = Post.fromDocument(snapshot.data);
-          return Center(
-            child: Scaffold(
-              appBar: header(context, titleText: post.description),
-              body: ListView(
-                children: <Widget>[
-                  Container(
-                    child: post,
-                  )
-                ],
-              ),
-            ),
-          );
         }
+        Post post = Post.fromDocument(snapshot.data);
+        return Center(
+          child: Scaffold(
+            appBar: header(context, titleText: post.description),
+            body: ListView(
+              children: <Widget>[
+                Container(
+                  child: post,
+                )
+              ],
+            ),
+          ),
+        );
       },
     );
   }

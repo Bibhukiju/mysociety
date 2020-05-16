@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import '../models/user.dart';
 import '../pages/home.dart';
-import '../widgets/progess.dart';
+import '../widgets/progress.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';

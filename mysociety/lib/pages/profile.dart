@@ -8,7 +8,7 @@ import '../pages/home.dart';
 import '../widgets/header.dart';
 import '../widgets/post.dart';
 import '../widgets/post_tile.dart';
-import '../widgets/progess.dart';
+import '../widgets/progress.dart';
 
 class Profile extends StatefulWidget {
   final String profileId;
@@ -148,17 +148,9 @@ class _ProfileState extends State<Profile> {
     // viewing your own profile - should show edit profile button
     bool isProfileOwner = currentUserId == widget.profileId;
     if (isProfileOwner) {
-      return Column(
-        children: <Widget>[
-          buildButton(
-            text: "Edit Profile",
-            function: editProfile,
-          ),
-          buildButton(
-            text: "logout",
-            function: logout,
-          ),
-        ],
+      return buildButton(
+        text: "Edit Profile",
+        function: editProfile,
       );
     } else if (isFollowing) {
       return buildButton(
@@ -329,7 +321,7 @@ class _ProfileState extends State<Profile> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            SvgPicture.asset('assets/images/no_content.svg', height: 260.0),
+            SvgPicture.asset('assets/upload.svg', height: 260.0),
             Padding(
               padding: EdgeInsets.only(top: 20.0),
               child: Text(
@@ -409,9 +401,5 @@ class _ProfileState extends State<Profile> {
         ],
       ),
     );
-  }
-
-  logout() async {
-    await googleSignIn.signOut();
   }
 }

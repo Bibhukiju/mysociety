@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import "package:flutter/material.dart";
 import '../models/user.dart';
 import '../pages/home.dart';
-import '../widgets/progess.dart';
+import '../widgets/progress.dart';
 
 class EditProfile extends StatefulWidget {
   final String currentUserId;
@@ -108,7 +108,7 @@ class _EditProfileState extends State<EditProfile> {
 
   logout() async {
     await googleSignIn.signOut();
-    Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+    Navigator.pop(context);
   }
 
   @override

@@ -5,7 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import '../models/user.dart';
 import '../pages/activityfeed.dart';
 import '../pages/home.dart';
-import '../widgets/progess.dart';
+import '../widgets/progress.dart';
 
 class Search extends StatefulWidget {
   @override

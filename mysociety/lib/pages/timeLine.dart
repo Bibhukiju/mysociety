@@ -5,7 +5,7 @@ import '../pages/home.dart';
 import '../pages/search.dart';
 import '../widgets/header.dart';
 import '../widgets/post.dart';
-import '../widgets/progess.dart';
+import '../widgets/progress.dart';
 
 final usersRef = Firestore.instance.collection('users');
 
