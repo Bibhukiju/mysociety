@@ -8,33 +8,36 @@ admin.initializeApp();
 // exports.helloWorld = functions.https.onRequest((request, response) => {
 //  response.send("Hello from Firebase!");
 // });
-
 exports.onCreateFollower = functions.firestore
   .document("/followers/{userId}/userFollowers/{followerId}")
   .onCreate(async (snapshot, context) => {
-    console.log("follower created", snapshot.data());
+    console.log("Follower Created", snapshot.id);
     const userId = context.params.userId;
     const followerId = context.params.followerId;
 
-    const followedUserRef = admin
+    // 1) Create followed users posts ref
+    const followedUserPostsRef = admin
       .firestore()
       .collection("posts")
       .doc(userId)
       .collection("userPosts");
 
-    const timeLinePostsRef = admin
+    // 2) Create following user's timeline ref
+    const timelinePostsRef = admin
       .firestore()
       .collection("timeline")
       .doc(followerId)
       .collection("timelinePosts");
 
-    const querySnapshot = await followedUserRef.get();
+    // 3) Get followed users posts
+    const querySnapshot = await followedUserPostsRef.get();
 
-    querySnapshot.forEach((doc) => {
+    // 4) Add each user post to following user's timeline
+    querySnapshot.forEach(doc => {
       if (doc.exists) {
         const postId = doc.id;
-        const postdata = doc.data();
-        timeLinePostsRef.doc(postId).set(postdata);
+        const postData = doc.data();
+        timelinePostsRef.doc(postId).set(postData);
       }
     });
   });
@@ -42,24 +45,27 @@ exports.onCreateFollower = functions.firestore
 exports.onDeleteFollower = functions.firestore
   .document("/followers/{userId}/userFollowers/{followerId}")
   .onDelete(async (snapshot, context) => {
-    console.log("followers Deleted", snapshot.id);
+    console.log("Follower Deleted", snapshot.id);
+
     const userId = context.params.userId;
     const followerId = context.params.followerId;
 
-    const timeLinePostsRef = admin
+    const timelinePostsRef = admin
       .firestore()
       .collection("timeline")
       .doc(followerId)
       .collection("timelinePosts")
       .where("ownerId", "==", userId);
-    const querySnapshot = await timeLinePostsRef.get();
-    querySnapshot.forEach((doc) => {
+
+    const querySnapshot = await timelinePostsRef.get();
+    querySnapshot.forEach(doc => {
       if (doc.exists) {
         doc.ref.delete();
       }
     });
   });
 
+// when a post is created, add post to timeline of each follower (of post owner)
 exports.onCreatePost = functions.firestore
   .document("/posts/{userId}/userPosts/{postId}")
   .onCreate(async (snapshot, context) => {
@@ -67,15 +73,18 @@ exports.onCreatePost = functions.firestore
     const userId = context.params.userId;
     const postId = context.params.postId;
 
-    const userFollowerRef = admin
+    // 1) Get all the followers of the user who made the post
+    const userFollowersRef = admin
       .firestore()
       .collection("followers")
       .doc(userId)
       .collection("userFollowers");
 
-    const querySnapshot = await userFollowerRef.get();
-    querySnapshot.forEach((doc) => {
+    const querySnapshot = await userFollowersRef.get();
+    // 2) Add new post to each follower's timeline
+    querySnapshot.forEach(doc => {
       const followerId = doc.id;
+
       admin
         .firestore()
         .collection("timeline")
@@ -86,20 +95,25 @@ exports.onCreatePost = functions.firestore
     });
   });
 
-exports.onUpdate = functions.firestore
+exports.onUpdatePost = functions.firestore
   .document("/posts/{userId}/userPosts/{postId}")
   .onUpdate(async (change, context) => {
     const postUpdated = change.after.data();
     const userId = context.params.userId;
     const postId = context.params.postId;
-    const userFollowerRef = admin
+
+    // 1) Get all the followers of the user who made the post
+    const userFollowersRef = admin
       .firestore()
       .collection("followers")
       .doc(userId)
       .collection("userFollowers");
-    const querySnapshot = await userFollowerRef.get();
-    querySnapshot.forEach((doc) => {
+
+    const querySnapshot = await userFollowersRef.get();
+    // 2) Update each post in each follower's timeline
+    querySnapshot.forEach(doc => {
       const followerId = doc.id;
+
       admin
         .firestore()
         .collection("timeline")
@@ -107,26 +121,32 @@ exports.onUpdate = functions.firestore
         .collection("timelinePosts")
         .doc(postId)
         .get()
-        .then((doc) => {
+        .then(doc => {
           if (doc.exists) {
             doc.ref.update(postUpdated);
           }
         });
     });
   });
-exports.onDelete = functions.firestore
+
+exports.onDeletePost = functions.firestore
   .document("/posts/{userId}/userPosts/{postId}")
   .onDelete(async (snapshot, context) => {
     const userId = context.params.userId;
     const postId = context.params.postId;
-    const userFollowerRef = admin
+
+    // 1) Get all the followers of the user who made the post
+    const userFollowersRef = admin
       .firestore()
       .collection("followers")
       .doc(userId)
       .collection("userFollowers");
-    const querySnapshot = await userFollowerRef.get();
-    querySnapshot.forEach((doc) => {
+
+    const querySnapshot = await userFollowersRef.get();
+    // 2) Delete each post in each follower's timeline
+    querySnapshot.forEach(doc => {
       const followerId = doc.id;
+
       admin
         .firestore()
         .collection("timeline")
@@ -134,7 +154,7 @@ exports.onDelete = functions.firestore
         .collection("timelinePosts")
         .doc(postId)
         .get()
-        .then((doc) => {
+        .then(doc => {
           if (doc.exists) {
             doc.ref.delete();
           }
@@ -145,28 +165,35 @@ exports.onDelete = functions.firestore
 exports.onCreateActivityFeedItem = functions.firestore
   .document("/feed/{userId}/feedItems/{activityFeedItem}")
   .onCreate(async (snapshot, context) => {
-    console.log("a", snapshot.data());
+    console.log("Activity Feed Item Created", snapshot.data());
+
+    // 1) Get user connected to the feed
     const userId = context.params.userId;
+
     const userRef = admin.firestore().doc(`users/${userId}`);
     const doc = await userRef.get();
-    const createdactivityFeedItem = snapshot.data();
-    const andriodNotificationToken = doc.data().andriodNotificationToken;
-    if (andriodNotificationToken) {
-      //send notifications
-      sendNotification(andriodNotificationToken, createdactivityFeedItem);
+
+    // 2) Once we have user, check if they have a notification token; send notification, if they have a token
+    const androidNotificationToken = doc.data().androidNotificationToken;
+    const createdActivityFeedItem = snapshot.data();
+    if (androidNotificationToken) {
+      sendNotification(androidNotificationToken, createdActivityFeedItem);
     } else {
-      console.log("no token ");
+      console.log("No token for user, cannot send notification");
     }
-    function sendNotification(andriodNotificationToken, activityFeedItem) {
+
+    function sendNotification(androidNotificationToken, activityFeedItem) {
       let body;
-      //switch body value based on notificationtype
+
+      // 3) switch body value based off of notification type
       switch (activityFeedItem.type) {
         case "comment":
-          body = `${activityFeedItem.username} replied: 
-          ${activityFeedItem.commentData}`;
+          body = `${activityFeedItem.username} replied: ${
+            activityFeedItem.commentData
+          }`;
           break;
         case "like":
-          body = `${activityFeedItem.username} liked: your post`;
+          body = `${activityFeedItem.username} liked your post`;
           break;
         case "follow":
           body = `${activityFeedItem.username} started following you`;
@@ -174,13 +201,24 @@ exports.onCreateActivityFeedItem = functions.firestore
         default:
           break;
       }
+
+      // 4) Create message for push notification
       const message = {
         notification: { body },
-        token: andriodNotificationToken,
-        data: { recipient: userId },
+        token: androidNotificationToken,
+        data: { recipient: userId }
       };
-      admin.messaging.send(message).then((response) => {
-        console.log("Sent sucess", response);
-      });
+
+      // 5) Send message with admin.messaging()
+      admin
+        .messaging()
+        .send(message)
+        .then(response => {
+          // Response is a message ID string
+          console.log("Successfully sent message", response);
+        })
+        .catch(error => {
+          console.log("Error sending message", error);
+        });
     }
   });
