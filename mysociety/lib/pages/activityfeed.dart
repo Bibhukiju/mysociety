@@ -6,6 +6,7 @@ import '../pages/post_screen.dart';
 import '../pages/profile.dart';
 import '../widgets/header.dart';
 import '../widgets/progess.dart';
+import 'package:mysociety/pages/profile.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class ActivityFeed extends StatefulWidget {

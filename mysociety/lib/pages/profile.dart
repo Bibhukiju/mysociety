@@ -122,7 +122,7 @@ class _ProfileState extends State<Profile> {
       child: FlatButton(
         onPressed: function,
         child: Container(
-          width: MediaQuery.of(context).size.width * .5,
+          width:MediaQuery.of(context).size.width/2,
           height: 27.0,
           child: Text(
             text,
@@ -321,7 +321,7 @@ class _ProfileState extends State<Profile> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            SvgPicture.asset('assets/upload.svg', height: 260.0),
+            SvgPicture.asset('assets/images/no_content.svg', height: 260.0),
             Padding(
               padding: EdgeInsets.only(top: 20.0),
               child: Text(

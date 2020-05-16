@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import '../models/user.dart';
 import '../pages/home.dart';
 import '../pages/search.dart';
-import '../widgets/post.dart'; 
+import '../widgets/header.dart';
+import '../widgets/post.dart';
 import '../widgets/progess.dart';
 
 final usersRef = Firestore.instance.collection('users');
@@ -18,6 +19,7 @@ class Timeline extends StatefulWidget {
 }
 
 class _TimelineState extends State<Timeline> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Post> posts;
   List<String> followingList = [];
 
@@ -122,14 +124,8 @@ class _TimelineState extends State<Timeline> {
   @override
   Widget build(context) {
     return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          automaticallyImplyLeading: false,
-          title: Text(
-            "Minista",
-            style: TextStyle(fontSize: 30, fontFamily: "Lobster"),
-          ),
-        ),
+        key: _scaffoldKey,
+        appBar: header(context, isAppTitle: true),
         body: RefreshIndicator(
             onRefresh: () => getTimeline(), child: buildTimeline()));
   }
