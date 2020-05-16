@@ -141,3 +141,46 @@ exports.onDelete = functions.firestore
         });
     });
   });
+
+exports.onCreateActivityFeedItem = functions.firestore
+  .document("/feed/{userId}/feedItems/{activityFeedItem}")
+  .onCreate(async (snapshot, context) => {
+    console.log("a", snapshot.data());
+    const userId = context.params.userId;
+    const userRef = admin.firestore().doc(`users/${userId}`);
+    const doc = await userRef.get();
+    const createdactivityFeedItem = snapshot.data();
+    const andriodNotificationToken = doc.data().andriodNotificationToken;
+    if (andriodNotificationToken) {
+      //send notifications
+      sendNotification(andriodNotificationToken, createdactivityFeedItem);
+    } else {
+      console.log("no token ");
+    }
+    function sendNotification(andriodNotificationToken, activityFeedItem) {
+      let body;
+      //switch body value based on notificationtype
+      switch (activityFeedItem.type) {
+        case "comment":
+          body = `${activityFeedItem.username} replied: 
+          ${activityFeedItem.commentData}`;
+          break;
+        case "like":
+          body = `${activityFeedItem.username} liked: your post`;
+          break;
+        case "follow":
+          body = `${activityFeedItem.username} started following you`;
+          break;
+        default:
+          break;
+      }
+      const message = {
+        notification: { body },
+        token: andriodNotificationToken,
+        data: { recipient: userId },
+      };
+      admin.messaging.send(message).then((response) => {
+        console.log("Sent sucess", response);
+      });
+    }
+  });

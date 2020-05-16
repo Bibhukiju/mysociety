@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,21 +9,19 @@ import '../pages/activityfeed.dart';
 import '../pages/createaccount.dart';
 import '../pages/profile.dart';
 import '../pages/search.dart';
+import '../pages/timeline.dart';
 import '../pages/upload.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
-import 'timeLine.dart';
 
 final GoogleSignIn googleSignIn = GoogleSignIn();
 final StorageReference storageRef = FirebaseStorage.instance.ref();
 final usersRef = Firestore.instance.collection('users');
 final postsRef = Firestore.instance.collection('posts');
-final timelineRef = Firestore.instance.collection('timeline');
 final commentsRef = Firestore.instance.collection('comments');
-
 final activityFeedRef = Firestore.instance.collection('feed');
 final followersRef = Firestore.instance.collection('followers');
-final followingRef = Firestore.instance.collection('followings');
+final followingRef = Firestore.instance.collection('following');
+final timelineRef = Firestore.instance.collection('timeline');
 final DateTime timestamp = DateTime.now();
 User currentUser;
 
@@ -31,6 +31,8 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   bool isAuth = false;
   PageController pageController;
   int pageIndex = 0;
@@ -53,17 +55,58 @@ class _HomeState extends State<Home> {
     });
   }
 
-  handleSignIn(GoogleSignInAccount account) {
+  handleSignIn(GoogleSignInAccount account) async {
     if (account != null) {
-      createUserInFirestore();
+      await createUserInFirestore();
       setState(() {
         isAuth = true;
       });
+      configurePushNotifications();
     } else {
       setState(() {
         isAuth = false;
       });
     }
+  }
+
+  configurePushNotifications() {
+    final GoogleSignInAccount user = googleSignIn.currentUser;
+    if (Platform.isIOS) getiOSPermission();
+
+    _firebaseMessaging.getToken().then((token) {
+      print("Firebase Messaging Token: $token\n");
+      usersRef
+          .document(user.id)
+          .updateData({"androidNotificationToken": token});
+    });
+
+    _firebaseMessaging.configure(
+      // onLaunch: (Map<String, dynamic> message) async {},
+      // onResume: (Map<String, dynamic> message) async {},
+      onMessage: (Map<String, dynamic> message) async {
+        print("on message: $message\n");
+        final String recipientId = message['data']['recipient'];
+        final String body = message['notification']['body'];
+        if (recipientId == user.id) {
+          print("Notification shown!");
+          SnackBar snackbar = SnackBar(
+              content: Text(
+            body,
+            overflow: TextOverflow.ellipsis,
+          ));
+          _scaffoldKey.currentState.showSnackBar(snackbar);
+        }
+        print("Notification NOT shown");
+      },
+    );
+  }
+
+  getiOSPermission() {
+    _firebaseMessaging.requestNotificationPermissions(
+        IosNotificationSettings(alert: true, badge: true, sound: true));
+    _firebaseMessaging.onIosSettingsRegistered.listen((settings) {
+      print("Settings registered: $settings");
+    });
   }
 
   createUserInFirestore() async {
@@ -86,6 +129,12 @@ class _HomeState extends State<Home> {
         "bio": "",
         "timestamp": timestamp
       });
+      // make new user their own follower (to include their posts in their timeline)
+      await followersRef
+          .document(user.id)
+          .collection('userFollowers')
+          .document(user.id)
+          .setData({});
 
       doc = await usersRef.document(user.id).get();
     }
@@ -123,11 +172,10 @@ class _HomeState extends State<Home> {
 
   Scaffold buildAuthScreen() {
     return Scaffold(
+      key: _scaffoldKey,
       body: PageView(
         children: <Widget>[
-          Timeline(
-            currentUser: currentUser,
-          ),
+          Timeline(currentUser: currentUser),
           ActivityFeed(),
           Upload(currentUser: currentUser),
           Search(),
@@ -175,65 +223,31 @@ class _HomeState extends State<Home> {
         ),
         alignment: Alignment.center,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            SizedBox(
-              height: MediaQuery.of(context).size.height * .02,
-            ),
-            Container(
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    height: 100,
-                    width: 100,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Image(
-                        image: AssetImage("assets/logo.png"),
-                      ),
-                    ),
-                  ),
-                  Text(
-                    'MINISTA',
-                    style: TextStyle(
-                      fontFamily: "Lobster",
-                      fontSize: 60.0,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
+            Text(
+              'Minist',
+              style: TextStyle(
+                fontFamily: "Signatra",
+                fontSize: 90.0,
+                color: Colors.white,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
-              child: GestureDetector(
-                  onTap: login,
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        CircleAvatar(
-                          backgroundImage: AssetImage("assets/googlelogo.jpg"),
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * .1,
-                        ),
-                        Text(
-                          "Login with google",
-                          style: TextStyle(
-                              fontSize: 20,
-                              color: Theme.of(context).accentColor),
-                        ),
-                      ],
+            GestureDetector(
+              onTap: login,
+              child: Container(
+                width: 260.0,
+                height: 60.0,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(
+                      'assets/googlelogo.jpg',
                     ),
-                  )),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
             )
           ],
         ),

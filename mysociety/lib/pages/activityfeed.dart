@@ -154,8 +154,7 @@ class ActivityFeedItem extends StatelessWidget {
                   children: [
                     TextSpan(
                       text: username,
-                      style: TextStyle(fontFamily: "Lobster",
-                      fontSize: 20),
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     TextSpan(
                       text: ' $activityItemText',
