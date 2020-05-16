@@ -5,7 +5,7 @@ AppBar header(context,
   return AppBar(
     automaticallyImplyLeading: false,
     title: Text(
-      isAppTitle ? "FlutterShare" : titleText,
+      isAppTitle ? "Minista" : titleText,
       style: TextStyle(
         color: Colors.white,
         fontFamily: "Lobster",

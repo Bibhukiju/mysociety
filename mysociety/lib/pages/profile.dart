@@ -122,7 +122,7 @@ class _ProfileState extends State<Profile> {
       child: FlatButton(
         onPressed: function,
         child: Container(
-          width:MediaQuery.of(context).size.width/2,
+          width: MediaQuery.of(context).size.width / 2,
           height: 27.0,
           child: Text(
             text,
@@ -148,9 +148,17 @@ class _ProfileState extends State<Profile> {
     // viewing your own profile - should show edit profile button
     bool isProfileOwner = currentUserId == widget.profileId;
     if (isProfileOwner) {
-      return buildButton(
-        text: "Edit Profile",
-        function: editProfile,
+      return Column(
+        children: <Widget>[
+          buildButton(
+            text: "Edit Profile",
+            function: editProfile,
+          ),
+          buildButton(
+            text: "logout",
+            function: logout,
+          ),
+        ],
       );
     } else if (isFollowing) {
       return buildButton(
@@ -401,5 +409,9 @@ class _ProfileState extends State<Profile> {
         ],
       ),
     );
+  }
+
+  logout() async {
+    await googleSignIn.signOut();
   }
 }
