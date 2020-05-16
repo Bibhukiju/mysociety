@@ -103,7 +103,6 @@ class ActivityFeedItem extends StatelessWidget {
   configureMediaPreview(context) {
     if (type == "like" || type == 'comment') {
       mediaPreview = GestureDetector(
-        onTap: () => showPost(context),
         child: Container(
           height: 50.0,
           width: 50.0,

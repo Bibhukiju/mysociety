@@ -226,26 +226,32 @@ class _HomeState extends State<Home> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'Minist',
-              style: TextStyle(
-                fontFamily: "Signatra",
-                fontSize: 90.0,
-                color: Colors.white,
+            Center(
+              child: Text(
+                'MINISTA',
+                style: TextStyle(
+                  fontFamily: "Lobster",
+                  fontSize: 90.0,
+                  color: Colors.white,
+                ),
               ),
             ),
             GestureDetector(
               onTap: login,
-              child: Container(
-                width: 260.0,
-                height: 60.0,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage(
-                      'assets/googlelogo.jpg',
+              child: Card(
+                elevation: 10,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
+                color: Colors.white,
+                child: Row(
+                  children: <Widget>[
+                    CircleAvatar(
+                      backgroundImage: AssetImage("assets/googlelogo.jpg"),
                     ),
-                    fit: BoxFit.cover,
-                  ),
+                    Container(
+                      child: Text("Login with Google"),
+                    )
+                  ],
                 ),
               ),
             )

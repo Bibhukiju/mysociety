@@ -21,20 +21,21 @@ class PostScreen extends StatelessWidget {
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return circularProgress();
-        }
-        Post post = Post.fromDocument(snapshot.data);
-        return Center(
-          child: Scaffold(
-            appBar: header(context, titleText: post.description),
-            body: ListView(
-              children: <Widget>[
-                Container(
-                  child: post,
-                )
-              ],
+        } else {
+          Post post = Post.fromDocument(snapshot.data);
+          return Center(
+            child: Scaffold(
+              appBar: header(context, titleText: post.description),
+              body: ListView(
+                children: <Widget>[
+                  Container(
+                    child: post,
+                  )
+                ],
+              ),
             ),
-          ),
-        );
+          );
+        }
       },
     );
   }
