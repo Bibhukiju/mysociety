@@ -226,10 +226,13 @@ class _HomeState extends State<Home> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
+            Image(
+              image: AssetImage(("assets/logo.png")),
+            ),
             Text(
               'MINISTA',
               style: TextStyle(
-                fontFamily: "Signatra",
+                fontFamily: "Lobster",
                 fontSize: 90.0,
                 color: Colors.white,
               ),
@@ -242,7 +245,7 @@ class _HomeState extends State<Home> {
                 decoration: BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage(
-                      'assets/googlelogo.jpg',
+                      'assets/googlelogo.png',
                     ),
                     fit: BoxFit.cover,
                   ),
